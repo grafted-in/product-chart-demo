@@ -1,0 +1,57 @@
+table.chart-builder {
+  margin: 0px auto;
+  width: 70%;
+}
+
+.chart-builder img {
+  width: 120px;
+}
+
+.chart-builder th[draggable] {
+  cursor: move;
+}
+
+.row-delete {
+  cursor: pointer;
+  vertical-align: middle;
+  width: 5px;
+}
+
+.add-row {
+  cursor: pointer;
+  font-size: 300%;
+}
+
+.row-drag {
+  cursor: move;
+  vertical-align: middle;
+  width: 5px;
+}
+
+.help-box {
+  font-size: 60%;
+  margin-top: 10em;
+}
+
+// Taken from this genius: https://coderwall.com/p/iml9ka/star-ratings-in-css-utf8
+.star-icon {
+    color: #ddd;
+    font-size: 2em;
+    text-shadow: 0 0 2px rgba(0,0,0,0.7);
+}
+.star-icon.full {
+    text-shadow: 0 0 2px rgba(0,0,0,0.7);
+    color: #FDE16D;
+}
+.star-icon.half:before {
+    text-shadow: 0 0 2px rgba(0,0,0,0.7);
+    color: #FDE16D;
+    width: 50%;
+    overflow: hidden;
+}
+@-moz-document url-prefix() { /* Firefox Hack :( */
+  .star-icon {
+    font-size: 50px;
+    line-height: 34px;
+  }
+}
