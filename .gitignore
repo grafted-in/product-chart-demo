@@ -1,0 +1,7 @@
+result
+dist/
+out/
+*.o
+*.hi
+*.js_hi
+*.js_o
