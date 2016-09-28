@@ -16,7 +16,7 @@ import           GHCJS.DOM.Element
 import           GHCJS.DOM.Document
 import           GHCJS.DOM.Node
 import           Miso
-
+import           Miso.Html
 
 addCss :: String -> IO ()
 addCss urlLocal = do
@@ -142,7 +142,7 @@ main :: IO ()
 main = do
   addAllCss
   clearBody
-  startApp model' view update defaultEvents (Proxy :: Proxy '[]) []
+  startApp model' view update defaultSettings
     where
       model' :: Model
       model' = Model chart' deletedRows' Nothing
@@ -190,10 +190,10 @@ chartModifier :: DragType -> Int -> Int -> Chart -> Chart
 chartModifier DragColumn from to chart = chart{chartOrder=shift from to (chart & chartOrder)}
 chartModifier DragRow    from to chart = chart{chartData=shift from to (chart & chartData)}
 
-view :: Model -> VTree ChartAction
+view :: Model -> View ChartAction
 view model = master (tableView model)
 
-tableView :: Model -> [VTree ChartAction]
+tableView :: Model -> [View ChartAction]
 tableView (Model modelChart _ dragInfo) =
   [ div_ [classes ["row"]]
     [ div_ [classes ["col-xs-12"]]
@@ -236,7 +236,7 @@ tableView (Model modelChart _ dragInfo) =
       Just info -> chartModifier (dragType info) (sourceIndex info) (destIndex info) modelChart
 
 
-toHead :: Maybe DragInfo -> [T.Text] -> VTree ChartAction
+toHead :: Maybe DragInfo -> [T.Text] -> View ChartAction
 toHead dragInfo columnNames =
   thead_ []
     [ tr_ []
@@ -255,7 +255,7 @@ toHead dragInfo columnNames =
          ])
         [ text_ columnName ]
 
-toBody :: Maybe DragInfo -> Chart -> VTree ChartAction
+toBody :: Maybe DragInfo -> Chart -> View ChartAction
 toBody dragInfo Chart{chartData=rows, chartOrder=columnNames} =
   tbody_ [] $
     for (zip [1..] rows) $ \(rowIndex, row) ->
@@ -281,7 +281,7 @@ toBody dragInfo Chart{chartData=rows, chartOrder=columnNames} =
           ]
         ]
 
-showColData :: ColumnName -> T.Text -> VTree a
+showColData :: ColumnName -> T.Text -> View a
 showColData col content
   | col == "Image"  = span_ [] [img_ [class_ "img-thumbnail", src_ content, alt_ "Amazon Product Image" ]]
   | col == "Price"  = text_ ("$" <> content)
@@ -289,7 +289,7 @@ showColData col content
   | otherwise       = text_ content
 
 
-toStars :: Float -> VTree a
+toStars :: Float -> View a
 toStars amount =
   span_ []
     [ star (amount - 0)
@@ -318,36 +318,39 @@ shift fromIndex toIndex xs = left ++ (item : right)
     (left, right) = splitAt (toIndex - 1) xs'
 
 
-fa :: T.Text -> VTree a
+fa :: T.Text -> View a
 fa icon = span_ [class_ $ "fa fa-" <> icon] []
 
 
-nav_ = mkNode "nav"
-i_ = mkNode "i"
-button_ = mkNode "button"
-img_ attrs = mkNode "img" attrs []
+mkNodeTxt :: T.Text -> [Attribute a] -> [View a] -> View a
+mkNodeTxt = mkNode HTML
+
+nav_ = mkNodeTxt "nav"
+i_ = mkNodeTxt "i"
+button_ = mkNodeTxt "button"
+img_ attrs = mkNodeTxt "img" attrs []
 
 src_, role_, alt_ :: T.Text -> Attribute a
 src_ url = prop "src" url
 role_ = prop "role"
 alt_ = prop "alt"
 
-br_ attrs = mkNode "br" attrs []
-h5_ = mkNode "h5"
-h2_ = mkNode "h2"
+br_ attrs = mkNodeTxt "br" attrs []
+h5_ = mkNodeTxt "h5"
+h2_ = mkNodeTxt "h2"
 
 
 classes :: [T.Text] -> Attribute a
 classes = class_ . T.unwords
 
-master :: [VTree a] -> VTree a
+master :: [View a] -> View a
 master content = div_ []
   [ topnav
   , div_ [class_ "container"] content
   ]
 
 
-topnav :: VTree a
+topnav :: View a
 topnav =
   div_ [classes ["navbar", "navbar-inverse", "navbar-static-top"], role_ "navigation"]
     [ div_ [classes ["container"]]

@@ -15,5 +15,6 @@ executable main
                      , ghcjs-base
                      , ghcjs-dom
                      , miso
+                     , miso-html
                      , text
   default-language:    Haskell2010
